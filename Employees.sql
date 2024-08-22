@@ -12,3 +12,17 @@
 -- SELECT max(salary) as "Max Salary" from salaries;
 -- SELECT sum(salary) as "Total Amount" from salaries;
 -- SELECT max(birth_date) as "Youngest Employee" FROM employees;
+
+-- Getting the details of employee Mayumi Schueller
+-- SELECT * from employees 
+-- WHERE first_name = 'Mayumi' AND last_name = 'Schueller';
+
+-- List of all the Female employees
+-- SELECT * from employees
+-- WHERE gender = 'F';
+
+-- Getting the details of Georgi Facello and Bezalel Simmel
+-- SELECT * from employees
+-- where first_name = 'Georgi' and last_name = 'Facello' and hire_date = '1986-06-26' 
+-- or first_name = 'Bezalel' and last_name = 'Simmel';
+
