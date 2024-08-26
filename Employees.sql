@@ -26,3 +26,9 @@
 -- where first_name = 'Georgi' and last_name = 'Facello' and hire_date = '1986-06-26' 
 -- or first_name = 'Bezalel' and last_name = 'Simmel';
 
+-- SELECT * from employees
+-- where not gender = 'M';
+
+-- Who over the age of 44 has an incomde of 100,000?
+SELECT DISTINCT emp_no, salary FROM salaries
+WHERE salary > 100000;
