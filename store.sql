@@ -40,6 +40,87 @@
 * Question: 
 * What was our total sales in June of 2004 for orders over 100 dollars?
 */
-SELECT sum(totalamount) FROM orders
-WHERE totalamount > 100 AND (orderdate >= '2004-06-01' AND orderdate <= '2004-06-30');
+-- SELECT sum(totalamount) from orders
+-- where totalamount > 100 and (orderdate >= '2004-06-01' and orderdate <= '2004-06-30');
 
+
+/*
+* DB: Store
+* Table: customers
+* Question: adjust the following query to display the null values as "No Address"
+*/
+-- SELECT COALESCE(address2, 'No Address') as "address2" FROM customers;
+
+/*
+* DB: Store
+* Table: customers
+* Question: Fix the following query to apply proper 3VL
+*/
+
+-- SELECT * FROM customers
+-- WHERE address2 IS NOT null;
+
+-- /*
+-- * DB: Store
+-- * Table: customers
+-- * Question: Fix the following query to apply proper 3VL
+-- */
+
+-- SELECT coalesce(lastName, 'Empty'), * from customers
+-- where (age is null);
+
+-- Who between the ages of 30 and 50 has an income less than 50 000?
+-- (include 30 and 50 in the results)
+-- SELECT * from customers
+-- where age between 30 and 50 and income < 50000;
+
+-- What is the average income between the ages of 20 and 50? (Including 20 and 50)
+-- SELECT avg(income) from customers
+-- where age BETWEEN 20 and 50;
+
+/*
+* DB: Store
+* Table: orders
+* Question: How many orders were made by customer 7888, 1082, 12808, 9623
+*/
+-- SELECT count(*) as "Number of Orders" FROM orders
+-- where customerid in (7888, 1082, 12808, 9623);
+
+/*
+* DB: Store
+* Table: customers
+* Question: How many people's zipcode have a 2 in it?.
+* Expected output: 4211 
+*/
+-- SELECT count(*) from customers
+-- where zip::text like '%2%';
+
+/*
+* DB: Store
+* Table: customers
+* Question: How many people's zipcode start with 2 with the 3rd character being a 1.
+* Expected output: 109 
+*/
+-- SELECT count(*) from customers
+-- where zip::text like '2_1%';
+
+/*
+* DB: Store
+* Table: customers
+* Question: Which states have phone numbers starting with 302?
+* Replace null values with "No State"                                                  
+* Expected output: https://imgur.com/AVe6G4c
+*/
+-- select COALESCE(state, 'No State') as "state" from customers
+-- where phone::text like '302%';
+
+/*
+* DB: Store
+* Table: orders
+* Question: How many orders were made in January 2004?
+*/
+-- SELECT * FROM orders
+-- where EXTRACT(month from orderdate) = 1 and EXTRACT(year from orderdate) = 2004;
+SELECT *
+FROM orders
+WHERE DATE_TRUNC('month', orderdate) = date '2004-01-01';
