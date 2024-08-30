@@ -121,6 +121,85 @@
 */
 -- SELECT * FROM orders
 -- where EXTRACT(month from orderdate) = 1 and EXTRACT(year from orderdate) = 2004;
-SELECT *
-FROM orders
-WHERE DATE_TRUNC('month', orderdate) = date '2004-01-01';
+-- SELECT *
+-- FROM orders
+-- WHERE DATE_TRUNC('month', orderdate) = date '2004-01-01';
+
+/*
+* DB: Store
+* Table: orders
+* Question: Get all orders from customers who live in Ohio (OH), New York (NY) or Oregon (OR) state
+* ordered by orderid
+*/
+-- select * 
+-- from customers as cust
+-- inner join orders as ord on cust.customerid = ord.customerid
+-- and cust.state in ('OH', 'NY', 'OR');
+
+-- SELECT c.firstname, c.lastname, o.orderid FROM orders AS o
+-- INNER JOIN customers AS c ON o.customerid = c.customerid
+-- WHERE c.state IN ('NY', 'OH', 'OR')
+-- ORDER BY o.orderid;
+
+
+/*
+* DB: Store
+* Table: products
+* Question: Show me the inventory for each product
+*/
+-- SELECT * 
+-- from inventory
+-- inner join products on inventory.prod_id = products.prod_id;
+
+SELECT EXTRACT (YEAR FROM orderdate) AS "year",
+       EXTRACT (MONTH FROM orderdate) AS "month",
+       EXTRACT (DAY FROM orderdate) AS "day",
+       sum(ol.quantity)
+FROM orderlines AS ol
+GROUP BY
+    ROLLUP(
+        EXTRACT (YEAR FROM orderdate),
+        EXTRACT (MONTH FROM orderdate),
+        EXTRACT (DAY FROM orderdate)
+    )
+ORDER BY
+    EXTRACT (YEAR FROM orderdate),
+    EXTRACT (MONTH FROM orderdate),
+    EXTRACT (DAY FROM orderdate);
+
+
+SELECT EXTRACT (YEAR FROM orderdate) AS "year",
+       EXTRACT (MONTH FROM orderdate) AS "month",
+       EXTRACT (DAY FROM orderdate) AS "day",
+       sum(ol.quantity)
+FROM orderlines AS ol
+GROUP BY
+    CUBE(
+        EXTRACT (YEAR FROM orderdate),
+        EXTRACT (MONTH FROM orderdate),
+        EXTRACT (DAY FROM orderdate)
+    )
+ORDER BY
+    EXTRACT (YEAR FROM orderdate),
+    EXTRACT (MONTH FROM orderdate),
+    EXTRACT (DAY FROM orderdate);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

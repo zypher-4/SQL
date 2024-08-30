@@ -106,7 +106,7 @@
 * Table: titles
 * Question: What unique titles do we have?
 */
-SELECT DISTINCT title FROM titles;
+-- SELECT DISTINCT title FROM titles;
 
 
 /*
@@ -114,4 +114,228 @@ SELECT DISTINCT title FROM titles;
 * Table: employees
 * Question: How many unique birth dates are there?
 */
-SELECT count(DISTINCT birth_date) FROM employees;
+-- SELECT count(DISTINCT birth_date) FROM employees;
+
+/*
+* DB: Employees
+* Table: employees
+* Question: Sort employees by first name ascending and last name descending
+*/
+-- SELECT first_name, last_name from employees
+-- order by first_name, last_name DESC;
+
+/*
+* DB: Employees
+* Table: employees
+* Question: Sort employees by age
+*/
+-- SELECT age(birth_date), * from employees
+-- order by age(birth_date);
+
+/*
+* DB: Employees
+* Table: employees
+* Question: Sort employees who's name starts with a "k" by hire_date
+*/
+-- SELECT * from employees
+-- where first_name like 'K%'
+-- order by hire_date;
+
+-- SELECT a.emp_no,
+--        concat(a.first_name, ' ', a.last_name) as "name",
+--        b.salary, b.from_date
+-- from employees as a, salaries as b
+-- where a.emp_no = b.emp_no;
+
+-- SELECT a.emp_no,
+--        concat(a.first_name, ' ', a.last_name) as "name",
+--        b.salary, b.from_date
+-- from employees as a
+-- inner join salaries as b on b.emp_no = a.emp_no
+-- order by a.emp_no, salary;
+
+-- SELECT a.emp_no,
+--        concat(a.first_name, ' ', a.last_name) as "name",
+--        b.salary,
+--        c.title,
+--        c.from_date as "promoted on"
+-- from employees as a
+-- inner join salaries as b on a.emp_no = b.emp_no
+-- inner join titles as c on c.emp_no = a.emp_no
+-- and c.from_date = (b.from_date + INTERVAL '2days')
+-- order by a.emp_no;
+ 
+-- SELECT a.emp_no,
+--        b.salary,
+--        b.from_date,
+--        c.title
+-- from employees as a
+-- inner join salaries as b on a.emp_no = b.emp_no
+-- inner join titles as c on c.emp_no = a.emp_no and (b.from_date + interval '2days') = c.from_date
+-- order by a.emp_no asc, b.from_date asc;
+
+-- SELECT a.emp_no,
+--        concat(a.first_name, ' ', a.last_name) as "name",
+--        b.salary,
+--        c.title,
+--        c.from_date as "promoted on"
+-- from employees as a
+-- inner join salaries as b on a.emp_no = b.emp_no
+-- inner join titles as c on c.emp_no = a.emp_no
+-- and (c.from_date = (b.from_date + INTERVAL '2days') or c.from_date = b.from_date)
+-- order by a.emp_no;
+
+-- SELECT a.emp_no, concat(a.first_name, ' ', a.last_name), b.salary
+-- from employees as a
+-- inner join salaries as b on a.emp_no = b.emp_no
+-- order by a.emp_no;
+
+-- SELECT emp.emp_no, dep.emp_no
+-- from employees as emp
+-- left join dept_manager as dep on emp.emp_no = dep.emp_no
+-- where dep.emp_no is not null;
+
+-- SELECT a.emp_no,
+--        concat(a.first_name, ' ', a.last_name),
+--        b.salary,
+--        COALESCE(c.title, 'no title change'),
+--        COALESCE(c.from_date::text, '-') as "title taken on"
+-- from employees as a
+-- inner join salaries as b on a.emp_no = b.emp_no
+-- left join titles as c on c.emp_no = a.emp_no
+-- and (c.from_date = (b.from_date + INTERVAL '2days') or c.from_date = b.from_date)
+-- order by a.emp_no;
+
+/*
+* DB: Employees
+* Table: employees
+* Question: Show me for each employee which department they work in
+*/
+-- SELECT emp.emp_no, 
+--        concat(emp.first_name, ' ', emp.last_name, ' works in ', dep.dept_name)
+-- from employees as emp
+-- inner join dept_emp as d_emp on emp.emp_no = d_emp.emp_no
+-- inner join departments as dep on d_emp.dept_no = dep.dept_no
+-- order by emp.emp_no;
+
+-- select dept_no, count(emp_no)
+-- from dept_emp
+-- group by dept_no;
+
+-- SELECT emp_no, sum(salary), max(salary) from salaries group by emp_no order by max(salary) DESC;
+
+/*
+*  How many people were hired on any given hire date?
+*  Database: Employees
+*  Table: Employees
+*/
+-- SELECT count(e.emp_no), e.hire_date
+-- FROM employees as e
+-- GROUP by e.hire_date
+-- order by e.hire_date;
+
+/*
+*   Show me all the employees, hired after 1991 and count the amount of positions they've had
+*  Database: Employees
+*/
+-- SELECT e.emp_no, concat(e.first_name, ' ', e.last_name), count(t.title)
+-- FROM employees as e
+-- inner join titles as t on e.emp_no = t.emp_no
+-- where e.hire_date > date '1991/01/01'
+-- group by e.emp_no
+-- order by e.emp_no;
+-- 
+
+/*
+*  Show me all the employees that work in the department development and the from and to date.
+*  Database: Employees
+*/
+-- SELECT e.emp_no, dept_emp.from_date, dept_emp.to_date
+-- FROM employees as e
+-- inner join dept_emp on e.emp_no = dept_emp.emp_no
+-- where dept_emp.dept_no = 'd005'
+-- GROUP BY e.emp_no, dept_emp.from_date, dept_emp.to_date
+-- ORDER BY e.emp_no, dept_emp.to_date;
+
+/*
+*  Show me all the employees, hired after 1991, that have had more than 2 titles
+*  Database: Employees
+*/
+-- SELECT e.emp_no, concat(e.first_name, ' ', e.last_name), count(t.title)
+-- from employees as e
+-- join titles as t using (emp_no)
+-- where EXTRACT (year from e.hire_date) > 1991
+-- group by e.emp_no
+-- having count(t.title) > 2
+-- order by e.emp_no;
+
+/*
+*  Show me all the employees that have had more than 15 salary changes that work in the department development
+*  Database: Employees
+*/
+-- SELECT e.emp_no, concat(e.first_name, ' ', e.last_name), count(s.salary)
+-- from employees as e
+-- join salaries as s using (emp_no)
+-- join dept_emp as de using (emp_no)
+-- where de.dept_no = 'd005'
+-- group by e.emp_no
+-- having count(s.salary) > 15
+-- order by e.emp_no;
+
+
+/*
+*  Show me all the employees that have worked for multiple departments
+*  Database: Employees
+*/
+-- SELECT e.emp_no, concat(e.first_name, ' ', e.last_name), count(de.dept_no)
+-- from employees as e 
+-- join dept_emp as de using (emp_no)
+-- group by e.emp_no
+-- having count(de.dept_no) > 1
+-- order by e.emp_no;
+
+-- select emp_no, max(from_date) 
+-- from salaries
+-- group by emp_no;
+
+/*
+*  Calculate the total amount of employees per department and the total using grouping sets
+*  Database: Employees
+*  Table: Employees
+*/
+SELECT d.dept_name, count(de.emp_no)
+FROM dept_emp AS de
+JOIN departments AS d USING(dept_no)
+GROUP BY 
+    GROUPING SETS (
+        (),
+        (d.dept_name)
+    )
+ORDER BY d.dept_name;
+
+/*
+*  Calculate the total average salary per department and the total using grouping sets
+*  Database: Employees
+*  Table: Employees
+*/
+SELECT de.dept_no, avg(salary)
+FROM salaries AS s
+JOIN dept_emp AS de USING (emp_no)
+GROUP BY
+    GROUPING SETS (
+        (),
+        (de.dept_no)
+    )
+ORDER BY de.dept_no;
+
+
+
+
+
+
+
+
+
+
+
+
