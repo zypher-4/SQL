@@ -303,30 +303,161 @@
 *  Database: Employees
 *  Table: Employees
 */
-SELECT d.dept_name, count(de.emp_no)
-FROM dept_emp AS de
-JOIN departments AS d USING(dept_no)
-GROUP BY 
-    GROUPING SETS (
-        (),
-        (d.dept_name)
-    )
-ORDER BY d.dept_name;
+-- SELECT d.dept_name, count(de.emp_no)
+-- from dept_emp as de
+-- join departments as d using(dept_no)
+-- group by 
+--     grouping sets (
+--         (),
+--         (d.dept_name)
+--     )
+-- order by d.dept_name;
 
 /*
 *  Calculate the total average salary per department and the total using grouping sets
 *  Database: Employees
 *  Table: Employees
 */
-SELECT de.dept_no, avg(salary)
-FROM salaries AS s
-JOIN dept_emp AS de USING (emp_no)
-GROUP BY
-    GROUPING SETS (
-        (),
-        (de.dept_no)
-    )
-ORDER BY de.dept_no;
+-- SELECT de.dept_no, avg(salary)
+-- from salaries as s
+-- join dept_emp as de using (emp_no)
+-- group by
+--     GROUPING sets (
+--         (),
+--         (de.dept_no)
+--     )
+-- order by de.dept_no;
+
+-- SELECT 
+--     * ,
+--     max(salary) over ()
+-- from salaries;
+
+-- SELECT 
+--     * ,
+--     avg(salary) over (PARTITION by d.dept_name),
+--     avg(salary) over (PARTITION by d.dept_name) - s.salary as "delta"
+-- from salaries as s
+-- join dept_emp as de using (emp_no)
+-- join departments as d using (dept_no);
+
+-- SELECT emp_no,
+--        salary,
+--        count(salary) over(
+--             PARTITION by emp_no
+--             order by salary
+--        )
+-- from salaries;
+
+-- select DISTINCT e.emp_no,
+--        e.first_name,
+--        d.dept_name,
+--        last_value(s.salary) over (
+--             PARTITION by e.emp_no
+--             order by s.from_date
+--             range between unbounded PRECEDING and UNBOUNDED FOLLOWING
+--        ) as "Current Salary"
+-- from salaries as s
+-- join employees as e using (emp_no)
+-- join dept_emp as de using (emp_no)
+-- join departments as d using (dept_no)
+-- order by e.emp_no;
+
+-- create or replace view last_salary_change as
+-- SELECT e.emp_no,
+--        max(s.from_date)
+-- from salaries as s
+-- join employees as e using (emp_no)
+-- JOIN dept_emp as de using (emp_no)
+-- join departments as d using (dept_no)
+-- GROUP by e.emp_no
+-- order by e.emp_no;
+
+-- SELECT * 
+-- from salaries as s
+-- join last_salary_change as lsc using (emp_no)
+-- where s.from_date = lsc.max
+-- order by emp_no;
+
+/*
+*  Create a view "90-95" that:
+*  Shows me all the employees, hired between 1990 and 1995
+*  Database: Employees
+*/
+-- CREATE or replace VIEW "90-95" AS
+-- SELECT * from employees
+-- where EXTRACT (year FROM hire_date) between 1990 and 1995;
+
+/*
+*  Create a view "bigbucks" that:
+*  Shows me all employees that have ever had a salary over 80000
+*  Database: Employees
+*/
+
+-- CREATE or replace VIEW "bigbucks" AS
+-- SELECT emp_no, e.first_name, e.last_name
+-- from employees as e
+-- join salaries as s using (emp_no)
+-- where salary > 80000
+-- group by emp_no
+-- order by emp_no;
+
+-- SELECT * from employees
+-- where age(birth_date) > (
+--     SELECT avg(age(birth_date)) FROM employees
+-- );
+
+-- SELECT e.emp_no, e.first_name, e.last_name, s.salary, t.title
+-- from employees as e
+-- join salaries as s using(emp_no)
+-- join dept_emp as de USING(emp_no)
+-- join titles as t using(emp_no)
+-- order by emp_no;
+
+-- select emp_no, salary, from_date, 
+--     (select title from titles as t 
+--      where t.emp_no=s.emp_no and 
+--     (t.from_date = s.from_date + interval '2 days' or t.from_date=s.from_date))
+-- from salaries as s
+-- order by emp_no;
+
+-- SELECT emp_no,
+--        salary as "most recent salary",
+--        from_date
+-- from salaries as s
+-- where from_date = (
+--     SELECT max(from_date)
+--     from salaries as sp
+--     where sp.emp_no = s.emp_no
+-- )
+-- order by emp_no asc;
+
+/*
+* DB: Employees
+* Table: employees
+* Question: Filter employees who have emp_no 110183 as a manager
+*/
+-- explain analyze select * 
+-- from employees as e
+-- join dept_emp as de using (emp_no)
+-- join dept_manager as dm using(dept_no)
+-- where dm.emp_no = 110183
+-- order by e.emp_no;
+-- explain analyze SELECT *
+-- FROM employees
+-- WHERE emp_no IN (
+--     SELECT emp_no
+--     FROM dept_emp
+--     WHERE dept_no = (
+--         SELECT dept_no 
+--         FROM dept_manager
+--         WHERE emp_no = 110183
+--     )
+-- )
+-- ORDER BY emp_no
+
+
+
 
 
 

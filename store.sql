@@ -151,38 +151,102 @@
 -- from inventory
 -- inner join products on inventory.prod_id = products.prod_id;
 
-SELECT EXTRACT (YEAR FROM orderdate) AS "year",
-       EXTRACT (MONTH FROM orderdate) AS "month",
-       EXTRACT (DAY FROM orderdate) AS "day",
-       sum(ol.quantity)
-FROM orderlines AS ol
-GROUP BY
-    ROLLUP(
-        EXTRACT (YEAR FROM orderdate),
-        EXTRACT (MONTH FROM orderdate),
-        EXTRACT (DAY FROM orderdate)
-    )
-ORDER BY
-    EXTRACT (YEAR FROM orderdate),
-    EXTRACT (MONTH FROM orderdate),
-    EXTRACT (DAY FROM orderdate);
+-- SELECT EXTRACT (year from orderdate) as "year",
+--        EXTRACT (MONTH from orderdate) as "month",
+--        EXTRACT (day from orderdate) as "day",
+--        sum(ol.quantity)
+-- from orderlines as ol
+-- GROUP BY
+--     rollup(
+--         EXTRACT (year from orderdate),
+--         EXTRACT (month from orderdate),
+--         EXTRACT (day from orderdate)
+--     )
+-- ORDER by
+--     EXTRACT (year from orderdate),
+--     EXTRACT (month from orderdate),
+--     EXTRACT (DAY from orderdate);
 
 
-SELECT EXTRACT (YEAR FROM orderdate) AS "year",
-       EXTRACT (MONTH FROM orderdate) AS "month",
-       EXTRACT (DAY FROM orderdate) AS "day",
-       sum(ol.quantity)
-FROM orderlines AS ol
-GROUP BY
-    CUBE(
-        EXTRACT (YEAR FROM orderdate),
-        EXTRACT (MONTH FROM orderdate),
-        EXTRACT (DAY FROM orderdate)
-    )
-ORDER BY
-    EXTRACT (YEAR FROM orderdate),
-    EXTRACT (MONTH FROM orderdate),
-    EXTRACT (DAY FROM orderdate);
+-- SELECT EXTRACT (year from orderdate) as "year",
+--        EXTRACT (MONTH from orderdate) as "month",
+--        EXTRACT (day from orderdate) as "day",
+--        sum(ol.quantity)
+-- from orderlines as ol
+-- GROUP BY
+--     cube(
+--         EXTRACT (year from orderdate),
+--         EXTRACT (month from orderdate),
+--         EXTRACT (day from orderdate)
+--     )
+-- ORDER by
+--     EXTRACT (year from orderdate),
+--     EXTRACT (month from orderdate),
+--     EXTRACT (DAY from orderdate);
+
+-- SELECT prod_id,
+--        price,
+--        category,
+--        first_value(price) over(
+--             PARTITION by category order by price range between UNBOUNDED PRECEDING and UNBOUNDED FOLLOWING
+--        )
+-- from products;
+
+/*
+* Database: Store
+* Table: products
+* Create a case statement that's named "price class" where if a product is over 20 dollars you show 'expensive'
+* if it's between 10 and 20 you show 'average' 
+* and of is lower than or equal to 10 you show 'cheap'.
+*/
+
+-- select prod_id, title, price,
+--        case
+--             when price > 20 then 'expensive'
+--             when price <= 10 then 'cheap'
+--             else 'average'
+--        end as "price class"
+-- from products;
+-- order by price;
+
+/*
+* DB: Store
+* Table: products
+* Question: Show NULL when the product is not on special (0)
+*/
+-- SELECT prod_id, title, price, NULLIF(special, 0) as "special"
+-- FROM products;
+
+-- SELECT title, price, (SELECT avg(price) from products) as "global average price"
+-- from products;
+-- SELECT prod_id, title, price, quan_in_stock
+-- FROM products
+-- join inventory using(prod_id);
+
+-- SELECT title, price, (SELECT avg(price) from products) as "global average price"
+-- from (
+--     SELECT * from products where price < 20
+-- ) as "products_sub";
+
+/*
+* DB: Store
+* Table: orders
+* Question: Get all orders from customers who live in Ohio (OH), New York (NY) or Oregon (OR) state
+* ordered by orderid
+*/
+-- SELECT * 
+-- from orders as o
+-- join customers as c using(customerid)
+-- where c.state in ('OH', 'NY', 'OR')
+-- order by orderid;
+-- 
+-- SELECT * 
+-- from orders as o
+-- join (
+--     SELECT * from customers as c
+--     where state in ('OH', 'NY', 'OR')
+-- ) using (customerid)
+-- order by orderid;
 
 
 
@@ -203,3 +267,11 @@ ORDER BY
 
 
 
+
+
+
+
+
+
+
+ 
